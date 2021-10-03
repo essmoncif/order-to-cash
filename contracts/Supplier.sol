@@ -59,8 +59,9 @@ contract Supplier {
         _supplier = Supplier_struct(name, block.timestamp, supplier_address);
     }
     
-    function createProduct(string memory product_name, string memory product_category, uint256 price) public returns(address){
-        ProductContract my_product = new ProductContract(product_name, product_category, price, msg.sender);
+    function createProduct(string memory product_name, string memory product_category, uint256 price, string memory carac) public returns(address){
+        
+        ProductContract my_product = new ProductContract(product_name, product_category, price, msg.sender, carac);
         _products[address(my_product)] = my_product;
         products_address.push(address(my_product));
         return address(my_product);
@@ -73,8 +74,8 @@ contract Supplier {
         return total_price;
     }
 
-    function createTermSheet(string memory issue, address sender, address receiver, uint totalPrice, uint commission, uint date_creation, uint closing_date, uint compensation) public returns(address)  {
-        TermSheet ts = new TermSheet(issue, sender, receiver, totalPrice, commission, date_creation, closing_date, compensation);
+    function createTermSheet(string memory issue, address sender, address receiver,  address [] memory products, uint tax, string memory incoterm, uint totalPrice, uint commission, uint date_creation, uint closing_date, uint compensation) public returns(address)  {
+        TermSheet ts = new TermSheet(issue, sender, receiver, products, tax, incoterm, totalPrice, commission, date_creation, closing_date, compensation);
         emit Termsheet(ts.getAddress(), sender, receiver);
         ts.getAddress();
     }
@@ -86,6 +87,16 @@ contract Supplier {
 
     function getAllProduct() public view returns(address [] memory) {
         return products_address;
+    }
+
+    function getOwnersOfProduct(address pr_address) isInStore(pr_address) public view returns(address[] memory){
+        ProductContract pr = _products[pr_address];
+        return pr.getOwners();
+    }
+
+    function addOwnerToProduct(address pr_address, address new_owner) isInStore(pr_address) public {
+        ProductContract pr = _products[pr_address];
+        pr.addOwner(new_owner);
     }
 
     function createTransporter(string memory company_name, string memory type_transport) public returns(address) {
