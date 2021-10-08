@@ -26,8 +26,8 @@ contract Client{
         _;
     }
     
-    constructor(address clientAddress, string memory ClientName) public {
-        _client = Client_struct(clientAddress, ClientName);
+    constructor(string memory client_name, address clientAddress) public {
+        _client = Client_struct(clientAddress, client_name);
         _owner = msg.sender;
     }
     
